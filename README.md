@@ -1,5 +1,5 @@
 # Bees
-Bees Recrut ment Test Assignment
+Bees Recruitment Test Assignment
 
 Bees Assignment Part 1 - Classes (including Unit Tests - Completed
 
