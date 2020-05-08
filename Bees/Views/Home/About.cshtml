@@ -1,0 +1,181 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+
+<p>This ASP.NET application was written to complete the Bees Object Oriented Exercise used as a recruitment test.</p>
+
+<p>This is a timed exercise with approximately 1 hour allocated<p>
+
+<p><b>Part 1 - The Classes</b><p>
+
+<p>Write classes to represent 3 different types of Bee - Worker, Queen and Drone.</p>
+
+<p>Each Bee has a floating-point health property, which is not writable externally and upon creation is set to a value of 100. </p>
+
+<p>Each Bee has a Damage() method that takes a single integer parameter that should be a value between 0 and 100. When this method is called, the health of the bee is to be reduced by that percentage of their current health.</p>
+
+<p>When a Worker has a health below 70% it cannot fly and therefore is pronounced Dead. When a Queen has a health below 20%, or a Drone below 50%, it is pronounced dead. This 'Dead' property should be readable from each Bee. When a Bee is dead, no further health deductions should be recorded by the bee, although the Damage() method should still be invokable without error.</p>
+
+<p><b>Part 2 - The Application</b></p>
+
+<p>Your application should create a single list containing 10 instances of each type of Bee. It must support methods to allow Damage() to be called for each Bee, and to return the health status of each bee, including whether it is alive or not. </p>
+
+<p>The user interface should show the current status of each bee and contain a button. When clicked, a different random value between 0 and 80 should be selected for each bee and applied with a call to Damage(). After each click the health status of the bees should be updated. </p>
+
+<p><b>Solution - Part 1</b></p>
+
+<p>
+    An interface IBee is used to ensure the classes implement the following methods:
+    <ul>
+        <li>void Damage(int damage);</li>
+        <li>decimal Status();</li>
+        <li> bool IsAlive();</li>
+    </ul>
+</p>
+
+<p>
+    An Abstract class Bee implements interface IBee and includes protected variables for instantiation in constructors of the subclasses Drone, Worker, Queen. The variables are accessed using properties which have get; but no set: accessors so no values can be updated externally. An _id and death threshold at which a bee dies are included here.
+    <ul>
+        <li>protected int _id;</li>
+        <li>protected decimal _health;</li>
+        <li>protected decimal _deathThreshold;</li>
+        <li>protected bool _dead;</li>
+    </ul>
+</p>
+
+<p>
+    Unit Tests are included for the class creations and the damage method. These are included in the BeesTest project and run using the Test menu in Visual Studio 2019. The Test Explorer and Live Test can be e problematic but work OK. A unit test to check the Drone is correctgly instantiated is shown below.
+    <pre>
+        [Test]
+        public void Drone_Create_Test()
+        {
+            // Arrange
+            var drone = new Drone(1);
+
+            // Act
+
+
+            // Assert
+            Assert.IsNotNull(drone);
+            Assert.AreEqual(drone.Status(), 100M);
+            Assert.AreEqual(drone.Threshold(), 50M);
+            Assert.AreEqual(drone.IsAlive(), true);
+        }
+    </pre>
+    A test to confirm the Damage() method works correctly is as follows.
+    <pre>
+        [Test]
+        public void Drone_Damage_Test()
+        {
+            // Arrange
+            var drone = new Drone(4);
+
+            // Act
+            drone.Damage(20);
+            drone.Damage(20);
+            drone.Damage(20);
+            drone.Damage(20);
+
+            // Assert
+            Assert.IsNotNull(drone);
+            Assert.AreEqual(drone.Status(), 40.96M);
+            Assert.AreEqual(drone.Threshold(), 50M);
+            Assert.AreEqual(drone.IsAlive(), false);
+        }
+    </pre>
+</p>
+
+<p><b>Solution - Part 2</b></p>
+
+<p>
+    An ASP.NET MVC application is used with a view model comprising a simple list of Bees.
+    <pre>
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using System.Web;
+        using Bees.Models;
+
+        namespace Bees.ViewModels
+        {
+            public class BeesModel
+            {
+                public List<Bee> Bees { get; set; }
+            }
+        }
+    
+    </pre>
+</p>
+
+<p>
+    The Home Controller Index() method is used to populate the list of Bees. An Update() method is used to update the Bees List when the Update button is clicked. To aid visibility the results are shown in a table including an Id, type of Bee, death threshold, as well as the health and status. The Index() method is shown below.
+
+    <pre>
+        public ActionResult Index()
+        {
+            TempData["bees"] = null;
+
+            ViewBag.Message = "Bees Page.";
+
+            // Instantiate list of 10 for each type of Bee for rendering on the page
+            var bees = new List<Bee>();
+            for (int i = 1; i <= 10; i++)
+            {
+                bees.Add(new Drone(i));
+            }
+            for (int i = 11; i <= 20; i++)
+            {
+                bees.Add(new Worker(i));
+            }
+            for (int i = 21; i <= 30; i++)
+            {
+                bees.Add(new Queen(i));
+            }
+
+            TempData["bees"] = bees;
+
+            return View(bees);
+        }
+    </pre>
+    The Update() method is shown below.
+    <pre>
+        public ActionResult Update()
+        {
+            ViewBag.Message = "Bees Page.";
+
+            // Update list of Bees by invoking Damage() method on each Bee
+            var bees = (List<Bee>)TempData["bees"];
+
+            Random r = new Random();
+            List<int> randoms = new List<int>();
+
+            // Determine random value (of damage) for each Bee in range (0, 80)
+            for (int i = 0; i < 30; i++)
+            {
+                randoms.Add(r.Next(0, 80));
+            }
+
+            // Invoke Damage() method using correct random value
+            for (int i = 0; i < 30; i++)
+            {
+                bees[i].Damage(randoms[i]);
+            }
+
+            TempData["bees"] = bees;
+
+            return View(bees);
+        }
+    </pre>
+    The corresponding views are quite straightforward. The Index.cshtml table codeand Update cshtml canoot be shown here as the page crashes
+  
+</p>
+
+<p><b>Running The Application</b></p>
+
+<p>Open the solution in Visual Studio 2019. Compile, build, and run. The default page is the Bees page. Check 30 Bees and properties are shown with Health 100.0 and Status Alive</p>
+
+<p>Click the Update button to update the Health when Damage() method is invoked for each Bee. The Health and Status are updated. To reset, Click Home or Bees on the menu bar.</p>
+
+

@@ -1,0 +1,37 @@
+﻿@using Bees.Models
+@model List<Bee>
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>Bees</h1>
+    <p class="lead">A list of Bees is shown in the table below. Click the Update button to invoke Damage() method using random value on each Bee. To reset, click Home or Bees in the menu bar.</p>
+    <p><a href="@Url.Action("Update", "Home")" class="btn btn-primary btn-lg">Update&nbsp;&nbsp;</a></p>
+</div>
+
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="20%">Id</th>
+                <th width="20%">Type</th>
+                <th width="20%">Threshold</th>
+                <th width="20%">Health</th>
+                <th width="20%">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id()</td>
+                    <td>@item.Type()</td>
+                    <td>@item.Threshold().ToString("0.00")</td>
+                    <td>@item.Status().ToString("0.00")</td>
+                    <td>@((item.IsAlive() == true) ? "Alive" : "Dead" )</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
