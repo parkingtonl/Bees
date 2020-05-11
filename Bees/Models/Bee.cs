@@ -40,7 +40,7 @@ namespace Bees.Models
         {
             if ((!_dead) && (damage > -1))
             {
-                _health = _health * (1 - ((decimal)damage / 100M));
+                _health = (damage <= 100) ? _health * (1 - ((decimal)damage / 100M)) : 0;
                 _dead = (_health < _deathThreshold) ? true : false;
             }
         }
